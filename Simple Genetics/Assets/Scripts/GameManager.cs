@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour {
             world.GetPopulation()[i].Print();
         }
 
+        world.BiasedRouletteWheel();
+
 	}
 	
 	// Update is called once per frame
