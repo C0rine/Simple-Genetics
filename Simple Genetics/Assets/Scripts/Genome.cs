@@ -22,6 +22,16 @@ public class Genome {
         nrOfGenes = nr;
     }
 
+    public bool[] GetGenes()
+    {
+        return this.genes;
+    }
+
+    public void SetGenes(bool[] genesToSet)
+    {
+        this.genes = genesToSet;
+    }
+
     public void RandomInit()
     {
         for(int i=0; i<nrOfGenes; i++)

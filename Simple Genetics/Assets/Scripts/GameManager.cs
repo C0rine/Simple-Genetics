@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
             world.GetPopulation()[i].Print();
         }
 
-        world.BiasedRouletteWheel();
+        world.CreateNextGen(world.GetPopulation());
 
 	}
 	
