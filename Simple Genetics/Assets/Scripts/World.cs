@@ -6,9 +6,11 @@ public class World {
 
     private Genome[] population;
 
+    public int crossOverChance = 50;
+    public int mutationChance = 100;
+
     private int kingScore = 14;
     private int nrOfGenes = 6;
-    private int nrOfWinningGenesPerRound = 2;
 
     public void InitializePopulation(int popSize)
     {
@@ -115,15 +117,36 @@ public class World {
 
         Genome[] maters = this.BiasedRouletteWheel();
 
-        int pointOfSwap1 = Random.Range(1, nrOfGenes);
-        Genome[] childpair1 = this.CrossOver(maters, pointOfSwap1);
-        int pointOfSwap2 = Random.Range(1, nrOfGenes);
-        Genome[] childpair2 = this.CrossOver(maters, pointOfSwap2);
+        // perform mutation if percentage wins
+        int random = Random.Range(0, 100);
+        if (random < mutationChance)
+        {
+            // TO DO: DEBUG HERE!!!!! mutation is not performed properly!
+            maters = this.Mutate(maters);
+            maters[0].Print();
+            maters[1].Print();
+        }
 
-        nextGen[0] = childpair1[0];
-        nextGen[1] = childpair1[1];
-        nextGen[2] = childpair2[0];
-        nextGen[3] = childpair2[1];
+        // oerform cross over if percentage wins
+        int random2 = Random.Range(0, 100);
+        if(random2 < crossOverChance)
+        {
+            Genome[] childpair1 = this.CrossOver(maters);
+            Genome[] childpair2 = this.CrossOver(maters);
+
+            nextGen[0] = childpair1[0];
+            nextGen[1] = childpair1[1];
+            nextGen[2] = childpair2[0];
+            nextGen[3] = childpair2[1];
+        }
+        else
+        {
+            nextGen[0] = maters[0];
+            nextGen[1] = maters[1];
+            nextGen[2] = maters[0];
+            nextGen[3] = maters[1];
+        }
+
 
         Debug.Log("New generation:");
 
@@ -134,17 +157,40 @@ public class World {
 
     }
 
+    // swaps one gene of two genomes 
+    public Genome[] Mutate(Genome[] input)
+    {
+        int swappoint = Random.Range(0, 5);
+
+        Debug.Log("Performing mutation at: " + swappoint);
+
+        for(int i = 0; i < input.Length; i++)
+        {
+            for(int j = 0; j < input[i].GetGenes().Length; j++)
+            {
+                if(j == swappoint && i == 0)
+                {
+                    input[i+1].GetGenes()[j] = input[i].GetGenes()[j];
+                }
+                else if(j == swappoint && i == 1)
+                {
+                    input[i-1].GetGenes()[j] = input[i].GetGenes()[j];
+                }
+            }
+        }
+
+        return input;
+
+    }
+
     // hardcoded for 2 parents and 2 outcomming children
-    public Genome[] CrossOver(Genome[] maters, int pointOfSwap)
+    public Genome[] CrossOver(Genome[] maters)
     {
         Genome[] children = new Genome[2];
+        int pointOfSwap = Random.Range(1, nrOfGenes);
 
         children[0] = DeepCopyGenome(maters[0]);
         children[1] = DeepCopyGenome(maters[1]);
-
-        Debug.Log("Deepcopies of the maters:");
-        children[0].Print();
-        children[1].Print();
        
         bool[] setA = new bool[pointOfSwap];
         bool[] setB = new bool[pointOfSwap];
@@ -173,8 +219,6 @@ public class World {
                 if (i == 0)
                 {
                     children[i].GetGenes()[j] = setB[j];
-                    Debug.Log("Child " + i + " at swappoint " + j);
-                    children[i].Print();
                 }
                 else if (i == 1)
                 {
