@@ -6,8 +6,8 @@ public class World {
 
     private Genome[] population;
 
-    public int crossOverChance = 50;
-    public int mutationChance = 100;
+    public int crossOverChance = 20;
+    public int mutationChance = 20;
 
     private int kingScore = 14;
     private int nrOfGenes = 6;
@@ -110,6 +110,18 @@ public class World {
         }
     }
 
+    public bool FoundWinner()
+    {
+        int counter = 0;
+
+        for(int i = 0; i < this.population.Length; i++)
+        {
+            counter += (this.IsKing(this.population[i])) ? 1 : 0;
+        }
+
+        return (counter > 0) ? true : false;
+    }
+
     // hardcoded to work for a population of 4 genomes
     public void CreateNextGen(Genome[] currGen)
     {
@@ -119,17 +131,14 @@ public class World {
 
         // perform mutation if percentage wins
         int random = Random.Range(0, 100);
-        if (random < mutationChance)
+        if (random <= mutationChance)
         {
-            // TO DO: DEBUG HERE!!!!! mutation is not performed properly!
             maters = this.Mutate(maters);
-            maters[0].Print();
-            maters[1].Print();
         }
 
         // oerform cross over if percentage wins
         int random2 = Random.Range(0, 100);
-        if(random2 < crossOverChance)
+        if(random2 <= crossOverChance)
         {
             Genome[] childpair1 = this.CrossOver(maters);
             Genome[] childpair2 = this.CrossOver(maters);
@@ -161,6 +170,7 @@ public class World {
     public Genome[] Mutate(Genome[] input)
     {
         int swappoint = Random.Range(0, 5);
+        bool swapped = false;
 
         Debug.Log("Performing mutation at: " + swappoint);
 
@@ -168,19 +178,18 @@ public class World {
         {
             for(int j = 0; j < input[i].GetGenes().Length; j++)
             {
-                if(j == swappoint && i == 0)
+                if (j == swappoint && i == 0)
                 {
-                    input[i+1].GetGenes()[j] = input[i].GetGenes()[j];
+                    swapped = (input[1].GetGenes()[j] != input[0].GetGenes()[j]) ? true : false;
+                    input[1].GetGenes()[j] = (input[0].GetGenes()[j] == true) ? true : false;
                 }
-                else if(j == swappoint && i == 1)
+                if(j == swappoint && i == 1 && swapped == true)
                 {
-                    input[i-1].GetGenes()[j] = input[i].GetGenes()[j];
+                    input[0].GetGenes()[j] = (input[1].GetGenes()[j] == true) ? false : true;
                 }
             }
         }
-
         return input;
-
     }
 
     // hardcoded for 2 parents and 2 outcomming children

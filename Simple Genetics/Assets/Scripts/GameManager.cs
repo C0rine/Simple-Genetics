@@ -12,13 +12,29 @@ public class GameManager : MonoBehaviour {
         world = new World();
         world.InitializePopulation(4);
 
-        for(int i=0; i < world.GetPopulationSize(); i++)
+        int generationCounter = 0;
+        int maxGenTries = 1000;
+
+        while (!world.FoundWinner())
         {
-            world.GetPopulation()[i].Print();
+            world.CreateNextGen(world.GetPopulation());
+            generationCounter += 1;
+
+            if (generationCounter > maxGenTries)
+            {
+                break;
+            }
         }
 
-        world.CreateNextGen(world.GetPopulation());
-
+        if (generationCounter <= maxGenTries)
+        {
+            Debug.Log("The winner is found at generation " + generationCounter + "!");
+        }
+        else
+        {
+            Debug.Log("Ran out of time, no winner created...");
+        }
+        
 	}
 	
 	// Update is called once per frame
